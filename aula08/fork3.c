@@ -9,6 +9,7 @@ int main(int argc, char *argv[]) {
         perror("Erro no fork\n");
         return EXIT_FAILURE;
     case 0: /* processo filho */
+        system("ls -l");
         if (execl("./child", "./child", NULL) < 0) {
             perror("erro no lancamento da aplicacao");
             return EXIT_FAILURE;
@@ -16,7 +17,7 @@ int main(int argc, char *argv[]) {
         printf("Porque é que eu não apareço?\n");
         break;
     default: /* processo pai */
-        sleep(1);
+        sleep(2);
         printf("Pai (depois do fork): PID = %u, PPID = %u\n", getpid(), getppid());
     }
 
