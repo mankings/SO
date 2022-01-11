@@ -14,27 +14,27 @@
  *     \li retrieval of a value.
  */
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <pthread.h>
 #include <errno.h>
+#include <pthread.h>
+#include <stdbool.h>
+#include <stdio.h>
 
 /** \brief internal storage size of <em>FIFO memory</em> */
-#define  M         2
+#define M 2
 
 /**
  *  \brief Definition of <em>FIFO memory</em> data type.
  */
 typedef struct
-        { /** \brief storage region for spectators/betters identification */
-          unsigned int mem[M];
-          /** \brief insertion pointer */
-          unsigned int ii;
-          /** \brief retrieval pointer */
-          unsigned int ri;
-          /** \brief flag signaling that FIFO is full */
-          bool full;
-        } FIFO;
+{ /** \brief storage region for spectators/betters identification */
+    unsigned int mem[M];
+    /** \brief insertion pointer */
+    unsigned int ii;
+    /** \brief retrieval pointer */
+    unsigned int ri;
+    /** \brief flag signaling that FIFO is full */
+    bool full;
+} FIFO;
 
 /** \brief internal storage region of FIFO type */
 static FIFO f;
@@ -59,8 +59,7 @@ static pthread_once_t init = PTHREAD_ONCE_INIT;
  *  \param p_f pointer to the location where the FIFO is stored
  */
 
-static void fifoInit (void)
-{
+static void fifoInit(void) {
     f.ii = f.ri = 0;
     f.full = false;
 }
@@ -73,34 +72,33 @@ static void fifoInit (void)
  *  \return status of operation (0 - success; -1 - error)
  */
 
-int fifoIn (unsigned int val)
-{
-    int stat;                                                                                  /* status of operation */
+int fifoIn(unsigned int val) {
+    int stat; /* status of operation */
 
-    if ((stat = pthread_mutex_lock (&accessCR)) != 0) {                                              /* enter monitor */
-        errno = stat;                                                                         /* save error condition */
+    if ((stat = pthread_mutex_lock(&accessCR)) != 0) { /* enter monitor */
+        errno = stat;                                  /* save error condition */
         return stat;
     }
-    pthread_once (&init, fifoInit);                                                   /* internal data initialization */
+    pthread_once(&init, fifoInit); /* internal data initialization */
 
-    while (f.full) {                                                                         /* check if FIFO is full */
-        if ((stat = pthread_cond_wait (&fifoFULL, &accessCR)) != 0) {  /* wait for available space to store the value */
-            errno = stat;                                                                     /* save error condition */
+    while (f.full) {                                                 /* check if FIFO is full */
+        if ((stat = pthread_cond_wait(&fifoFULL, &accessCR)) != 0) { /* wait for available space to store the value */
+            errno = stat;                                            /* save error condition */
             return stat;
         }
     }
 
-    f.mem[f.ii] = val;                                                                             /* store the value */
+    f.mem[f.ii] = val; /* store the value */
     f.ii = (f.ii + 1) % M;
     f.full = (f.ii == f.ri);
 
-    if ((stat = pthread_cond_signal (&fifoEMPTY)) != 0) {           /* signal some consumer that a value is available */
-        errno = stat;                                                                         /* save error condition */
+    if ((stat = pthread_cond_signal(&fifoEMPTY)) != 0) { /* signal some consumer that a value is available */
+        errno = stat;                                    /* save error condition */
         return stat;
     }
 
-    if ((stat = pthread_mutex_unlock (&accessCR)) != 0) {                                             /* exit monitor */
-        errno = stat;                                                                         /* save error condition */
+    if ((stat = pthread_mutex_unlock(&accessCR)) != 0) { /* exit monitor */
+        errno = stat;                                    /* save error condition */
         return stat;
     }
 
@@ -115,34 +113,33 @@ int fifoIn (unsigned int val)
  *  \return status of operation (0 - success; -1 - error)
  */
 
-int fifoOut (unsigned int *p_val)
-{
-    int stat;                                                                                  /* status of operation */
+int fifoOut(unsigned int *p_val) {
+    int stat; /* status of operation */
 
-    if ((stat = pthread_mutex_lock (&accessCR)) != 0) {                                              /* enter monitor */
-        errno = stat;                                                                         /* save error condition */
+    if ((stat = pthread_mutex_lock(&accessCR)) != 0) { /* enter monitor */
+        errno = stat;                                  /* save error condition */
         return stat;
     }
-    pthread_once (&init, fifoInit);                                                   /* internal data initialization */
+    pthread_once(&init, fifoInit); /* internal data initialization */
 
-    while (!(f.full) && (f.ii == f.ri)) {                                                   /* check if FIFO is empty */
-        if ((stat = pthread_cond_wait (&fifoEMPTY, &accessCR)) != 0) {            /* wait for a value to be available */
-            errno = stat;                                                                     /* save error condition */
+    while (!(f.full) && (f.ii == f.ri)) {                             /* check if FIFO is empty */
+        if ((stat = pthread_cond_wait(&fifoEMPTY, &accessCR)) != 0) { /* wait for a value to be available */
+            errno = stat;                                             /* save error condition */
             return stat;
         }
     }
 
-    *p_val = f.mem[f.ri];                                                                         /* retrieve a value */
+    *p_val = f.mem[f.ri]; /* retrieve a value */
     f.ri = (f.ri + 1) % M;
     f.full = false;
 
-    if ((stat = pthread_cond_signal (&fifoFULL)) != 0) {              /* signal some producer that space is available */
-        errno = stat;                                                                         /* save error condition */
+    if ((stat = pthread_cond_signal(&fifoFULL)) != 0) { /* signal some producer that space is available */
+        errno = stat;                                   /* save error condition */
         return stat;
     }
 
-    if ((stat = pthread_mutex_unlock (&accessCR)) != 0) {                                             /* exit monitor */
-        errno = stat;                                                                         /* save error condition */
+    if ((stat = pthread_mutex_unlock(&accessCR)) != 0) { /* exit monitor */
+        errno = stat;                                    /* save error condition */
         return stat;
     }
 
