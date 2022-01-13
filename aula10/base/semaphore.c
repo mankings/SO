@@ -15,12 +15,12 @@
  */
 
 #include <stdio.h>
-#include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <sys/types.h>
 
 /** \brief access permission: user r-w */
-#define  MASK           0600
+#define MASK 0600
 
 /**
  *  \brief Creation of a set of semaphores.
@@ -35,9 +35,8 @@
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-int semCreate (int key, unsigned int snum)
-{
-    return semget ((key_t) key, snum+1, MASK | IPC_CREAT | IPC_EXCL);
+int semCreate(int key, unsigned int snum) {
+    return semget((key_t)key, snum + 1, MASK | IPC_CREAT | IPC_EXCL);
 }
 
 /**
@@ -51,16 +50,16 @@ int semCreate (int key, unsigned int snum)
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-int semConnect (int key)
-{
-    int semgid;                                                                            /* semaphore set identifier */
-    struct sembuf init[2] = {{ 0, -1, 0 }, {0, 1, 0}};                                     /* initialization operation */
+int semConnect(int key) {
+    int semgid;                                      /* semaphore set identifier */
+    struct sembuf init[2] = {{0, -1, 0}, {0, 1, 0}}; /* initialization operation */
 
-    if ((semgid = semget ((key_t) key, 1, MASK)) == -1)
+    if ((semgid = semget((key_t)key, 1, MASK)) == -1)
         return -1;
-    else if (semop (semgid, init, 2) == -1)
-             return -1;
-         else return semgid;
+    else if (semop(semgid, init, 2) == -1)
+        return -1;
+    else
+        return semgid;
 }
 
 /**
@@ -74,9 +73,8 @@ int semConnect (int key)
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-int semDestroy (int semgid)
-{
-    return semctl (semgid, 0, IPC_RMID, NULL);
+int semDestroy(int semgid) {
+    return semctl(semgid, 0, IPC_RMID, NULL);
 }
 
 /**
@@ -90,11 +88,10 @@ int semDestroy (int semgid)
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-int semSignal (int semgid)
-{
-    struct sembuf up = { 0, 1, 0 };                                                         /* all around up operation */
+int semSignal(int semgid) {
+    struct sembuf up = {0, 1, 0}; /* all around up operation */
 
-    return semop (semgid, &up, 1);
+    return semop(semgid, &up, 1);
 }
 
 /**
@@ -109,12 +106,11 @@ int semSignal (int semgid)
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-int semDown (int semgid, unsigned int sindex)
-{
-    struct sembuf down = { 0, -1, 0 };                                                      /* specific down operation */
+int semDown(int semgid, unsigned int sindex) {
+    struct sembuf down = {0, -1, 0}; /* specific down operation */
 
-    down.sem_num = (unsigned short) sindex;
-    return semop (semgid, &down, 1);
+    down.sem_num = (unsigned short)sindex;
+    return semop(semgid, &down, 1);
 }
 
 /**
@@ -129,11 +125,10 @@ int semDown (int semgid, unsigned int sindex)
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-int semUp (int semgid, unsigned int sindex)
-{
-    struct sembuf up = { 0, 1, 0 };                                                           /* specific up operation */
+int semUp(int semgid, unsigned int sindex) {
+    struct sembuf up = {0, 1, 0}; /* specific up operation */
 
-    up.sem_num = (unsigned short) sindex;
+    up.sem_num = (unsigned short)sindex;
 
-    return semop (semgid, &up, 1);
+    return semop(semgid, &up, 1);
 }

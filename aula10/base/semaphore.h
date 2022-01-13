@@ -30,7 +30,7 @@
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-extern int semCreate (int key, unsigned int snum);
+extern int semCreate(int key, unsigned int snum);
 
 /**
  *  \brief Connection to a previously created set of semaphores.
@@ -43,7 +43,7 @@ extern int semCreate (int key, unsigned int snum);
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-extern int semConnect (int key);
+extern int semConnect(int key);
 
 /**
  *  \brief Destruction of a previously created set of semaphores.
@@ -56,7 +56,7 @@ extern int semConnect (int key);
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-extern int semDestroy (int semgid);
+extern int semDestroy(int semgid);
 
 /**
  *  \brief Signalling start of operations upon initialization of shared data structures.
@@ -69,7 +69,7 @@ extern int semDestroy (int semgid);
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-extern int semSignal (int semgid);
+extern int semSignal(int semgid);
 
 /**
  *  \brief <em>Down</em> of a semaphore within the set.
@@ -83,7 +83,7 @@ extern int semSignal (int semgid);
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-extern int semDown (int semgid, unsigned int sindex);
+extern int semDown(int semgid, unsigned int sindex);
 
 /**
  *  \brief <em>Up</em> of a semaphore within the set.
@@ -97,6 +97,6 @@ extern int semDown (int semgid, unsigned int sindex);
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-extern int semUp (int semgid, unsigned int sindex);
+extern int semUp(int semgid, unsigned int sindex);
 
 #endif /* SEMAPHORE_H_ */

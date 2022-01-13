@@ -28,7 +28,7 @@
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-extern int shmemCreate (int key, unsigned int size);
+extern int shmemCreate(int key, unsigned int size);
 
 /**
  *  \brief Connection to a previously created block.
@@ -41,7 +41,7 @@ extern int shmemCreate (int key, unsigned int size);
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-extern int shmemConnect (int key);
+extern int shmemConnect(int key);
 
 /**
  *  \brief Destruction of a previously created block.
@@ -54,7 +54,7 @@ extern int shmemConnect (int key);
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-extern int shmemDestroy (int shmid);
+extern int shmemDestroy(int shmid);
 
 /**
  *  \brief Mapping of the block previously created on the process address space.
@@ -68,7 +68,7 @@ extern int shmemDestroy (int shmid);
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-extern int shmemAttach (int shmid, void **pAttAdd);
+extern int shmemAttach(int shmid, void **pAttAdd);
 
 /**
  *  \brief Unmapping of the block off the process address space.
@@ -82,6 +82,6 @@ extern int shmemAttach (int shmid, void **pAttAdd);
  *  \return -\c 1, when an error occurs (the actual situation is reported in <tt>errno</tt>)
  */
 
-extern int shmemDettach (void *attAdd);
+extern int shmemDettach(void *attAdd);
 
 #endif /* SHAREDMEMORY_H_ */
