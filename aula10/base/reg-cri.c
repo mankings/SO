@@ -19,6 +19,7 @@
 #include <unistd.h>
 
 #include "sharedMemory.h"
+#include "semaphore.h"
 
 #define SHMKEY 0x100
 #define NPROC 4
@@ -88,11 +89,23 @@ void delay(int nite) {
 }
 
 static int create(void) {
+    int semId;
+
     /* cria a memória partilhada, falhando se já existir */
     if (shmemCreate(SHMKEY, sizeof(long)) == -1) {
         perror("shmemCreate");
         return EXIT_FAILURE;
     }
+
+    /* cria aray de semaforos, falhando se já existir */
+    if((semId=semCreate(SHMKEY,1)) == -1){
+        perror ("semCreate");
+        return EXIT_FAILURE;
+    }
+
+    semUp(semId,1);
+    semSignal(semId);
+
     return EXIT_SUCCESS;
 }
 
@@ -104,9 +117,20 @@ static int destroy(void) {
         return EXIT_FAILURE;
     }
 
+    int semId = semConnect (SHMKEY);
+    if (semId == -1) { 
+        perror ("semId");
+        return EXIT_FAILURE;
+    }
+
     /* destroi-a */
     if (shmemDestroy(shmid) == -1) {
         perror("shmemDestroy");
+        return EXIT_FAILURE;
+    }
+
+    if(semDestroy(semId) == -1){
+        perror("semDestroy");
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
@@ -119,6 +143,13 @@ static int iter(int niter) {
     int shmid = shmemConnect(SHMKEY);
     if (shmid == -1) {
         perror("shmemConnect");
+        return EXIT_FAILURE;
+    }
+
+    /* ganha acesso ao array de semaforos */
+    int semId = semConnect (SHMKEY);
+    if (semId == -1) { 
+        perror ("semConnect");
         return EXIT_FAILURE;
     }
 
@@ -138,6 +169,9 @@ static int iter(int niter) {
 
             case 0:                           // processo incrementador
                 for (j = 0; j < niter; j++) { /* faz cópia do contador em mem. part. */
+                // inicio da região crítica
+
+                    semDown(semId, 1);
                     auxcnt = *cntp;
 
                     /* generate a time delay */
@@ -146,6 +180,7 @@ static int iter(int niter) {
                     /* incrementa a cópia e armazena-a em mem. part. */
                     *cntp = auxcnt + 1;
 
+                    semUp(semId, 1);
                     /* generate a time delay */
                     delay(BIG);
                 }

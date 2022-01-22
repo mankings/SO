@@ -8,10 +8,10 @@ LDFLAGS = -lm
 
 all: reg-cri
 
-reg-cri:	sharedMemory.o reg-cri.o
+reg-cri:	sharedMemory.o semaphore.o reg-cri.o
 	gcc ${CFLAGS} -o $@ $^ ${LDFLAGS}
 
-reg-cri.o:	sharedMemory.h
+reg-cri.o:	sharedMemory.h semaphore.h
 
 
 clean:
